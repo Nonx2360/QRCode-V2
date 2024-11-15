@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Generator-V2</title>
+    <style>
+    body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #2C3E50, #34495E); /* Dark blue gradient background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    color: white;
+}
+
+.container {
+    background-color: #1A242F; /* Darker container background */
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); /* Stronger shadow for a more dramatic effect */
+    width: 480px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+}
+
+.container:hover {
+    transform: translateY(-10px); /* Slightly elevate the container on hover */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); /* Deeper shadow on hover */
+}
+
+.input-container {
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: column; /* Stack the inputs vertically */
+}
+
+#urlInput {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #34495E;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+#urlInput:focus {
+    outline: none;
+    border: 2px solid #3498db;
+    background-color: #2C3E50;
+}
+
+.btn {
+    background-color: #3498db; /* Bright blue button */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+#qrCode {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+#qrCode img {
+    max-width: 300px;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 10px; /* Smooth edges for the QR code */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Subtle shadow for QR code */
+}
+
+#saveButton {
+    margin-top: 15px;
+    display: none;
+}
+
+.qr-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.about-dev-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 14px;
+    padding: 10px 18px;
+    background-color: #2980b9;
+    border-radius: 5px;
+    text-transform: uppercase;
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.about-dev-btn:hover {
+    background-color: #3498db;
+    transform: scale(1.05);
+}
+
+.color-picker-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+input[type="color"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 3px solid #3498db;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="color"]:hover {
+    border-color: #2980b9;
+    box-shadow: 0 0 10px rgba(41, 128, 185, 0.6);
+}
+
+input[type="color"]:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 10px rgba(41, 128, 185, 0.6);
+}
+
+.color-instructions {
+    font-size: 14px;
+    color: #bdc3c7;
+    margin-bottom: 10px;
+}
+
+.color-picker-section {
+    margin-top: 20px;
+}
+
+h2 {
+    color: #ecf0f1;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>QR Code Generator-V2</h2>
+        <div class="input-container">
+            <input type="text" id="urlInput" placeholder="Enter URL">
+            <!-- Instructions for color pickers -->
+            <p class="color-instructions">Choose colors for both the QR code and its background below.</p>
+            
+            <!-- QR Code Color Picker Section -->
+            <div class="color-picker-section">
+                <p class="color-instructions">1. Pick QR Code Color:</p>
+                <div class="color-picker-container">
+                    <input type="color" id="colorPickerQRCode" value="#000000"> <!-- QR Code Color Picker -->
+                </div>
+            </div>
+            
+            <!-- Background Color Picker Section -->
+            <div class="color-picker-section">
+                <p class="color-instructions">2. Pick QR Code Background Color:</p>
+                <div class="color-picker-container">
+                    <input type="color" id="colorPickerBackground" value="#ffffff"> <!-- Background Color Picker -->
+                </div>
+            </div>
+
+            <button id="generateBtn" class="btn">Generate</button>
+        </div>
+        
+        <div class="qr-wrapper">
+            <div id="qrCode"></div>
+        </div>
+        
+        <button id="saveButton" class="btn">Save Image</button>
+
+        <!-- About Dev Button -->
+        <a href="https://nonx2360.github.io/About-Me/" target="_blank" class="btn about-dev-btn">
+            About Dev
+        </a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const qrCodeDiv = document.getElementById('qrCode');
+        const saveButton = document.getElementById('saveButton');
+        const colorPickerQRCode = document.getElementById('colorPickerQRCode');
+        const colorPickerBackground = document.getElementById('colorPickerBackground');
+
+        generateBtn.addEventListener('click', () => {
+            const url = urlInput.value.trim();
+            const qrCodeColor = colorPickerQRCode.value; // Get the selected QR code color
+            const backgroundColor = colorPickerBackground.value; // Get the selected background color
+
+            if (url) {
+                // Clear previous QR code
+                qrCodeDiv.innerHTML = '';
+                
+                // Generate new QR code with custom QR code color and background color
+                new QRCode(qrCodeDiv, {
+                    text: url,
+                    width: 300,
+                    height: 300,
+                    colorDark: qrCodeColor, // Apply selected QR code color
+                    colorLight: backgroundColor, // Apply selected background color
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                qrCodeDiv.style.display = 'flex';
+                saveButton.style.display = 'inline-block';
+            } else {
+                alert('Please enter a valid URL');
+            }
+        });
+
+        saveButton.addEventListener('click', () => {
+            const qrCodeImg = qrCodeDiv.querySelector('img');
+            if (qrCodeImg) {
+                const link = document.createElement('a');
+                link.download = 'qr_code.png';
+                link.href = qrCodeImg.src;
+                link.click();
+            }
+        });
+    </script>
+</body>
+</html>
