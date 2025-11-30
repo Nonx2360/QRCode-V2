@@ -1,220 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>QR Code Generator-V2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Generator Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#050505',
+                        card: 'rgba(20, 20, 20, 0.8)',
+                        neon: '#00f3ff',
+                        'neon-glow': 'rgba(0, 243, 255, 0.4)',
+                        input: '#111',
+                    },
+                    fontFamily: {
+                        sans: ['Rajdhani', 'sans-serif'],
+                    },
+                    animation: {
+                        scan: 'scan 2s infinite linear',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { top: '0', opacity: '0' },
+                            '10%': { opacity: '1' },
+                            '90%': { opacity: '1' },
+                            '100%': { top: '100%', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #1a1a1a; /* Dark background */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        color: white;
-    }
+        body {
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(188, 19, 254, 0.05) 0%, transparent 20%);
+        }
 
-    .container {
-        background-color: #2d2d2d; /* Darker container background */
-        border-radius: 15px;
-        padding: 40px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        width: 480px;
-        text-align: center;
-        position: relative;
-    }
+        .clip-corner {
+            clip-path: polygon(0 0,
+                    100% 0,
+                    100% calc(100% - 20px),
+                    calc(100% - 20px) 100%,
+                    0 100%);
+        }
 
-    .input-container {
-        display: flex;
-        margin-bottom: 20px;
-        flex-direction: column; /* Stack the inputs vertically */
-    }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
 
-    #urlInput {
-        padding: 12px;
-        border: 2px solid #4285F4; /* Google Blue border */
-        border-radius: 8px;
-        margin-bottom: 10px;
-        background-color: #3d3d3d;
-        color: white;
-        font-size: 16px;
-    }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
 
-    #urlInput:focus {
-        outline: none;
-        border-color: #4285F4; /* Google Blue border on focus */
-        background-color: #2d2d2d;
-    }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
 
-    .btn {
-        background-color: #4285F4; /* Google Blue button */
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        text-transform: uppercase;
-    }
-
-    #qrCode {
-        margin-top: 25px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        display: none;
-    }
-
-    #qrCode img {
-        max-width: 300px;
-        max-height: 300px;
-        object-fit: contain;
-        border-radius: 10px; /* Smooth edges for the QR code */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Subtle shadow for QR code */
-    }
-
-    #saveButton {
-        margin-top: 15px;
-        display: none;
-    }
-
-    .qr-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .about-dev-btn {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        font-size: 14px;
-        padding: 10px 18px;
-        background-color: #4285F4; /* Google Blue button */
-        border-radius: 5px;
-        text-transform: uppercase;
-        color: white;
-        font-weight: bold;
-        text-decoration: none;
-    }
-
-    .color-picker-container {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 10px;
-    }
-
-    input[type="color"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        border: 3px solid #4285F4; /* Google Blue border */
-        background-color: transparent;
-        cursor: pointer;
-    }
-
-    input[type="color"]:focus {
-        outline: none;
-        border-color: #4285F4; /* Google Blue border on focus */
-    }
-
-    .color-instructions {
-        font-size: 14px;
-        color: #bdc3c7;
-        margin-bottom: 10px;
-    }
-
-    .color-picker-section {
-        margin-top: 20px;
-    }
-
-    h2 {
-        color: #ecf0f1;
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 20px;
-    }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>QR Code Generator-V2</h2>
-        <div class="input-container">
-            <input type="text" id="urlInput" placeholder="Enter URL">
-            <!-- Instructions for color pickers -->
-            <p class="color-instructions">Choose colors for both the QR code and its background below.</p>
 
-            <!-- QR Code Color Picker Section -->
-            <div class="color-picker-section">
-                <p class="color-instructions">1. Pick QR Code Color:</p>
-                <div class="color-picker-container">
-                    <input type="color" id="colorPickerQRCode" value="#000000"> <!-- QR Code Color Picker -->
-                </div>
-            </div>
+<body class="bg-dark text-gray-200 font-sans min-h-screen flex items-center justify-center overflow-x-hidden">
 
-            <!-- Background Color Picker Section -->
-            <div class="color-picker-section">
-                <p class="color-instructions">2. Pick QR Code Background Color:</p>
-                <div class="color-picker-container">
-                    <input type="color" id="colorPickerBackground" value="#ffffff"> <!-- Background Color Picker -->
-                </div>
-            </div>
-
-            <button id="generateBtn" class="btn">Generate</button>
+    <div
+        class="relative w-full max-w-[500px] p-12 text-center bg-card backdrop-blur-md border border-gray-800 rounded shadow-[0_0_30px_rgba(0,0,0,0.8)] clip-corner group">
+        <!-- Top Gradient Line -->
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-neon to-transparent">
         </div>
 
-        <div class="qr-wrapper">
-            <div id="qrCode"></div>
+        <h2
+            class="text-white text-3xl font-bold mb-8 uppercase tracking-widest drop-shadow-[0_0_10px_rgba(0,243,255,0.4)]">
+            QR Generator <span class="text-neon">V3</span>
+        </h2>
+
+        <div class="mb-6 text-left">
+            <label class="block text-sm text-gray-500 mb-2 uppercase tracking-wider">Target URL</label>
+            <input type="text" id="urlInput" placeholder="https://example.com"
+                class="w-full p-4 bg-input border border-gray-800 text-white text-lg focus:outline-none focus:border-neon focus:shadow-[0_0_15px_rgba(0,243,255,0.4)] transition-all duration-300">
         </div>
 
-        <button id="saveButton" class="btn">Save Image</button>
+        <div class="flex justify-between gap-4 mb-8">
+            <div
+                class="flex-1 bg-input border border-gray-800 p-2 flex items-center justify-between cursor-pointer hover:border-gray-600 transition-colors group/picker">
+                <label class="m-0 cursor-pointer text-gray-400 group-hover/picker:text-gray-200"
+                    for="colorPickerQRCode">QR Color</label>
+                <input type="color" id="colorPickerQRCode" value="#00f3ff"
+                    class="w-8 h-8 bg-transparent border-none cursor-pointer p-0 appearance-none">
+            </div>
+            <div
+                class="flex-1 bg-input border border-gray-800 p-2 flex items-center justify-between cursor-pointer hover:border-gray-600 transition-colors group/picker">
+                <label class="m-0 cursor-pointer text-gray-400 group-hover/picker:text-gray-200"
+                    for="colorPickerBackground">Background</label>
+                <input type="color" id="colorPickerBackground" value="#050505"
+                    class="w-8 h-8 bg-transparent border-none cursor-pointer p-0 appearance-none">
+            </div>
+        </div>
 
-        <!-- About Dev Button -->
-        <a href="https://nonx2360.github.io/About-Me/" target="_blank" class="btn about-dev-btn">
-            About Dev
-        </a>
+        <button id="generateBtn"
+            class="w-full bg-transparent text-neon border border-neon py-4 text-lg font-bold uppercase tracking-widest cursor-pointer transition-all duration-300 hover:bg-neon hover:text-black hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] relative overflow-hidden">
+            Initialize Sequence
+        </button>
+
+        <div id="qrCodeContainer"
+            class="hidden mt-10 relative justify-center items-center p-5 bg-black/30 border border-gray-800 transition-colors duration-100">
+            <!-- Scanning Effect -->
+            <div
+                class="absolute top-0 left-0 w-full h-[2px] bg-neon shadow-[0_0_10px_#00f3ff] animate-scan opacity-50 pointer-events-none">
+            </div>
+
+            <!-- Corner Accents -->
+            <div
+                class="absolute w-2.5 h-2.5 border-2 border-neon transition-all duration-300 -top-px -left-px border-r-0 border-b-0">
+            </div>
+            <div
+                class="absolute w-2.5 h-2.5 border-2 border-neon transition-all duration-300 -top-px -right-px border-l-0 border-b-0">
+            </div>
+            <div
+                class="absolute w-2.5 h-2.5 border-2 border-neon transition-all duration-300 -bottom-px -left-px border-r-0 border-t-0">
+            </div>
+            <div
+                class="absolute w-2.5 h-2.5 border-2 border-neon transition-all duration-300 -bottom-px -right-px border-l-0 border-t-0">
+            </div>
+
+            <div id="qrCode" class="max-w-full block"></div>
+        </div>
+
+        <button id="saveButton"
+            class="hidden mt-4 w-full bg-transparent text-gray-500 border border-gray-600 py-4 text-lg font-bold uppercase tracking-widest cursor-pointer transition-all duration-300 hover:bg-gray-800 hover:border-gray-400 hover:text-white">
+            Download Asset
+        </button>
     </div>
+
+    <a href="https://nonx2360.github.io/About-Me/" target="_blank"
+        class="fixed bottom-5 right-5 text-gray-600 text-xs uppercase tracking-widest hover:text-neon transition-colors">
+        System by Nonx2
+    </a>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         const urlInput = document.getElementById('urlInput');
         const generateBtn = document.getElementById('generateBtn');
         const qrCodeDiv = document.getElementById('qrCode');
+        const qrCodeContainer = document.getElementById('qrCodeContainer');
         const saveButton = document.getElementById('saveButton');
         const colorPickerQRCode = document.getElementById('colorPickerQRCode');
         const colorPickerBackground = document.getElementById('colorPickerBackground');
 
         generateBtn.addEventListener('click', () => {
             const url = urlInput.value.trim();
-            const qrCodeColor = colorPickerQRCode.value; // Get the selected QR code color
-            const backgroundColor = colorPickerBackground.value; // Get the selected background color
+            const qrCodeColor = colorPickerQRCode.value;
+            const backgroundColor = colorPickerBackground.value;
 
             if (url) {
                 // Clear previous QR code
                 qrCodeDiv.innerHTML = '';
 
-                // Generate new QR code with custom QR code color and background color
+                // Generate new QR code
                 new QRCode(qrCodeDiv, {
                     text: url,
-                    width: 300,
-                    height: 300,
-                    colorDark: qrCodeColor, // Apply selected QR code color
-                    colorLight: backgroundColor, // Apply selected background color
+                    width: 250,
+                    height: 250,
+                    colorDark: qrCodeColor,
+                    colorLight: backgroundColor,
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                qrCodeDiv.style.display = 'flex';
-                saveButton.style.display = 'inline-block';
+                // Show container and save button
+                qrCodeContainer.style.display = 'flex';
+                saveButton.style.display = 'block';
+
+                // Add a little glitch effect to the container border on generate
+                qrCodeContainer.classList.add('border-white');
+                setTimeout(() => {
+                    qrCodeContainer.classList.remove('border-white');
+                }, 100);
+
             } else {
-                alert('Please enter a valid URL');
+                // Shake animation for error
+                urlInput.classList.add('border-red-500');
+                setTimeout(() => {
+                    urlInput.classList.remove('border-red-500');
+                }, 500);
             }
         });
 
@@ -222,11 +200,12 @@
             const qrCodeImg = qrCodeDiv.querySelector('img');
             if (qrCodeImg) {
                 const link = document.createElement('a');
-                link.download = 'qr_code.png';
+                link.download = 'qr_code_v3.png';
                 link.href = qrCodeImg.src;
                 link.click();
             }
         });
     </script>
 </body>
+
 </html>
